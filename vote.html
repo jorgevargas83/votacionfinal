@@ -4,15 +4,24 @@
   <meta charset="utf-8">
   <title>Votar</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #scoreSection { display: none; } /* Ocultar hasta validar */
+  </style>
 </head>
 <body>
   <h1>Votación</h1>
 
   <div id="voteForm">
-    <input id="code" placeholder="Carnet">
-    <label for="score">Puntuación: <span id="scoreValue">5</span></label>
-    <input id="score" type="range" min="0" max="10" step="0.1" value="5">
-    <button id="voteBtn">Enviar Voto</button>
+    <!-- Paso 1: Carnet -->
+    <input id="code" placeholder="Escribe tu carnet">
+    <button id="validateCode">Validar Carnet</button>
+
+    <!-- Paso 2: Votación (aparece después de validar) -->
+    <div id="scoreSection">
+      <label for="score">Puntuación: <span id="scoreValue">5</span></label>
+      <input id="score" type="range" min="0" max="10" step="0.1" value="5">
+      <button id="voteBtn">Enviar Voto</button>
+    </div>
   </div>
 
   <script type="module" src="vote.js"></script>
