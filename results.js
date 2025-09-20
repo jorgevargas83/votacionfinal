@@ -6,15 +6,18 @@ import {
   getDocs,
   onSnapshot,
   doc,
-  updateDoc
+  getDoc,
+  updateDoc,
+  onSnapshot as onDocSnapshot
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const params = new URLSearchParams(location.search);
 const pollId = params.get("poll");
 const resultsDiv = document.getElementById("results");
 const closePollBtn = document.getElementById("closePollBtn");
+const pollStatus = document.getElementById("pollStatus");
 
-// 🏷️ Datos de jueces con nombre y foto
+// 🏷️ Datos de jueces con nombres y fotos
 const judgesInfo = {
   JUEZ1: {
     name: "Ing. Chinchilla",
@@ -30,17 +33,32 @@ const judgesInfo = {
   }
 };
 
+// 🔄 Estado de la encuesta en tiempo real
+const pollRef = doc(db, "polls", pollId);
+onDocSnapshot(pollRef, (snapshot) => {
+  if (!snapshot.exists()) {
+    pollStatus.textContent = "❌ Encuesta no encontrada";
+    closePollBtn.disabled = true;
+    return;
+  }
 
+  const isOpen = snapshot.data().is_open;
+  pollStatus.textContent = isOpen ? "🔓 Encuesta Abierta" : "🔒 Encuesta Cerrada";
+  pollStatus.style.color = isOpen ? "green" : "red";
+  closePollBtn.disabled = !isOpen;
+});
+
+// Botón para cerrar encuesta
 if (closePollBtn) {
   closePollBtn.onclick = async () => {
     if (confirm("¿Cerrar encuesta? Nadie podrá votar después.")) {
-      await updateDoc(doc(db, "polls", pollId), { is_open: false });
+      await updateDoc(pollRef, { is_open: false });
       alert("✅ Encuesta cerrada");
-      closePollBtn.disabled = true;
     }
   };
 }
 
+// Cargar participantes y escuchar votos
 async function loadParticipants() {
   const judgesSnap = await getDocs(query(collection(db, "judges"), where("pollId", "==", pollId)));
   const publicSnap = await getDocs(query(collection(db, "public"), where("pollId", "==", pollId)));
@@ -59,6 +77,7 @@ function listenVotes(judges, publics) {
   onSnapshot(q, (snapshot) => {
     let sumJudges = 0, sumPublic = 0, countPublic = 0;
     const judgeScores = {};
+
     snapshot.forEach((doc) => {
       const v = doc.data();
       if (v.role === "judge") {
@@ -78,6 +97,7 @@ function listenVotes(judges, publics) {
     judges.forEach((j) => {
       const info = judgesInfo[j] || { name: j, photo: "" };
       const score = judgeScores[j] ?? null;
+
       html += `<li class="judge-item">
         ${info.photo ? `<img src="${info.photo}" class="judge-photo">` : ""}
         <span class="judge-name">${info.name}</span> ${score !== null ? "✅" : "❌"}
@@ -91,4 +111,3 @@ function listenVotes(judges, publics) {
     resultsDiv.innerHTML = html;
   });
 }
-
