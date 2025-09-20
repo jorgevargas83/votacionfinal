@@ -9,29 +9,41 @@ import {
 
 const judgesList = document.getElementById("judgesList");
 
-// 🔄 Función para cargar lista de jueces al inicio y después de registrar
+// 🔄 Función para cargar lista de jueces
 async function loadJudges() {
   judgesList.innerHTML = "Cargando jueces...";
-
   try {
     const snapshot = await getDocs(collection(db, "judges"));
+
     if (snapshot.empty) {
       judgesList.innerHTML = "<p>No hay jueces registrados aún.</p>";
       return;
     }
 
-    judgesList.innerHTML = "";
+    // Usar Map para evitar duplicados
+    const uniqueJudges = new Map();
+
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
+      if (data.name && data.code) {
+        if (!uniqueJudges.has(data.code)) {
+          uniqueJudges.set(data.code, { id: docSnap.id, ...data });
+        }
+      }
+    });
+
+    judgesList.innerHTML = "";
+    uniqueJudges.forEach(judge => {
       const div = document.createElement("div");
       div.classList.add("judge-item");
       div.innerHTML = `
-        <input type="checkbox" value="${docSnap.id}">
-        <img src="${data.photo}" alt="${data.name}">
-        <span>${data.name} (${data.code})</span>
+        <input type="checkbox" value="${judge.id}">
+        <img src="${judge.photo || "https://via.placeholder.com/28"}" alt="${judge.name}">
+        <span>${judge.name} (${judge.code})</span>
       `;
       judgesList.appendChild(div);
     });
+
   } catch (error) {
     console.error("Error cargando jueces:", error);
     judgesList.innerHTML = "❌ Error al cargar jueces.";
@@ -45,6 +57,7 @@ await loadJudges();
 document.getElementById("createPoll").onclick = async function () {
   const title = (document.getElementById("title").value || "").trim();
   const photoURL = (document.getElementById("photoURL").value || "").trim();
+
   if (!title) return alert("⚠️ El nombre es obligatorio");
 
   try {
@@ -104,7 +117,7 @@ document.getElementById("createPoll").onclick = async function () {
     document.getElementById("title").value = "";
     document.getElementById("photoURL").value = "";
 
-    // Desmarcar jueces después de crear la encuesta
+    // Desmarcar jueces seleccionados
     document.querySelectorAll("#judgesList input:checked").forEach(cb => (cb.checked = false));
 
   } catch (error) {
@@ -140,5 +153,3 @@ document.getElementById("registerJudge").onclick = async function () {
     alert("❌ Hubo un error registrando el juez.");
   }
 };
-
-
