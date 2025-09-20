@@ -5,7 +5,8 @@
   <title>Votar</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    #scoreSection { display: none; } /* Ocultar hasta validar */
+    #scoreSection { display: none; }
+    #welcomeMsg { display: none; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -15,6 +16,9 @@
     <!-- Paso 1: Carnet -->
     <input id="code" placeholder="Escribe tu carnet">
     <button id="validateCode">Validar Carnet</button>
+
+    <!-- Mensaje de bienvenida -->
+    <div id="welcomeMsg"></div>
 
     <!-- Paso 2: Votación (aparece después de validar) -->
     <div id="scoreSection">
