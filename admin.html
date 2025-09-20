@@ -90,5 +90,29 @@
 
   <script type="module" src="app.js"></script>
   <script type="module" src="admin.js"></script>
+<div class="section">
+  <h2>Crear Encuesta</h2>
+  <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
+  <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
+  
+  <h3 style="cursor:pointer" onclick="toggleJudges()">👥 Seleccionar Jueces ▼</h3>
+  <div id="judgesContainer" style="display:none; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: #f8f8f8;">
+    <div id="judgesList">Cargando jueces...</div>
+  </div>
+
+  <button id="createPoll">Crear Encuesta</button>
+  <div id="qrContainer"></div>
+  <div id="resultsQR"></div>
+</div>
+
+<script>
+  function toggleJudges() {
+    const container = document.getElementById("judgesContainer");
+    container.style.display = container.style.display === "none" ? "block" : "none";
+  }
+</script>
+
+
 </body>
 </html>
+
