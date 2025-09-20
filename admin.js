@@ -1,26 +1,54 @@
 import { db } from "./app.js";
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import {
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-const createPollBtn = document.getElementById("createPoll");
-const resultsLink = document.getElementById("resultsLink");
+document.getElementById("createPoll").onclick = async function () {
+  const title = (document.getElementById("title").value || "").trim();
+  if (!title) return alert("⚠️ El título es obligatorio");
 
-createPollBtn.onclick = async () => {
-  const title = document.getElementById("title").value.trim();
-  if (!title) return alert("Escribe un título");
+  // Crear encuesta en Firestore
+  const pollRef = await addDoc(collection(db, "polls"), {
+    title,
+    is_open: true
+  });
 
-  const pollRef = await addDoc(collection(db, "polls"), { title, is_open: true });
   const pollId = pollRef.id;
 
-  // Crear jueces y público
-  for (let i = 1; i <= 3; i++) {
-    await addDoc(collection(db, "judges"), { pollId, code: `JUEZ${i}` });
-    await addDoc(collection(db, "public"), { pollId, code: `PUBLICO${i}` });
+  // Crear jueces automáticamente con nombre y foto
+  const judges = [
+    {
+      code: "JUEZ1",
+      name: "Ing. Chinchilla",
+      photo: "https://drive.google.com/uc?export=view&id=1_ct5WtotaYDi3lxgri1aNgf5sojC8ojC"
+    },
+    {
+      code: "JUEZ2",
+      name: "Ing. Villatoro",
+      photo: "https://drive.google.com/uc?export=view&id=1lAqor5HSJi-SH731ifu5bR3uVLepvgx1"
+    },
+    {
+      code: "JUEZ3",
+      name: "Ing. Guzmán",
+      photo: "https://drive.google.com/uc?export=view&id=1_ct5WtotaYDi3lxgri1aNgf5sojC8ojC"
+    }
+  ];
+
+  for (const j of judges) {
+    await addDoc(collection(db, "judges"), {
+      pollId,
+      code: j.code,
+      name: j.name,
+      photo: j.photo
+    });
   }
 
-  const voteUrl = `${location.origin}/vote.html?poll=${pollId}`;
-  resultsLink.href = `results.html?poll=${pollId}`;
-  resultsLink.style.display = "block";
+  // Crear códigos de público si lo deseas
+  const publicCodes = ["PUBLICO1", "PUBLICO2", "PUBLICO3"];
+  for (const p of publicCodes) {
+    await addDoc(collection(db, "public"), { pollId, code: p });
+  }
 
-  QRCode.toCanvas(document.getElementById("qrCanvas"), voteUrl, { width: 200 });
-  document.getElementById("qrContainer").style.display = "block";
+  alert("✅ Encuesta creada con jueces y público incluidos.");
 };
