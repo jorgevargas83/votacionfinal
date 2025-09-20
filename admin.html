@@ -22,9 +22,9 @@
       margin: 10px;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      width: 320px;
+      width: 340px;
     }
-    input {
+    input[type="text"] {
       padding: 8px;
       font-size: 1rem;
       border: 1px solid #ccc;
@@ -45,6 +45,19 @@
     button:hover {
       background-color: #45a049;
     }
+    .judge-item {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+      font-size: 0.9rem;
+      gap: 10px;
+    }
+    .judge-item img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
     #qrContainer, #resultsQR {
       margin-top: 20px;
       text-align: center;
@@ -59,6 +72,8 @@
     <h2>Crear Encuesta</h2>
     <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
     <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
+    <h3>Selecciona Jueces:</h3>
+    <div id="judgesList">Cargando jueces...</div>
     <button id="createPoll">Crear Encuesta</button>
     <div id="qrContainer"></div>
     <div id="resultsQR"></div>
