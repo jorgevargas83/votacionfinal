@@ -14,6 +14,7 @@ const pollId = params.get("poll");
 const scoreInput = document.getElementById("score");
 const scoreValue = document.getElementById("scoreValue");
 const validateBtn = document.getElementById("validateCode");
+const welcomeMsg = document.getElementById("welcomeMsg");
 
 let validatedCode = null;
 let validatedRole = null;
@@ -21,6 +22,13 @@ let validatedRole = null;
 scoreInput.addEventListener("input", () => {
   scoreValue.textContent = scoreInput.value;
 });
+
+// Mapa de nombres de jueces (igual que en results.js)
+const judgeNames = {
+  JUEZ1: "Ing. Chinchilla",
+  JUEZ2: "Ing. Villatoro",
+  JUEZ3: "Ing. Guzmán"
+};
 
 // Paso 1: Validar carnet
 validateBtn.onclick = async () => {
@@ -50,13 +58,20 @@ validateBtn.onclick = async () => {
   );
   if (!existingSnap.empty) return alert("⚠️ Este carnet ya votó.");
 
-  // ✅ Validación exitosa → habilitar la sección de votación
+  // ✅ Validación exitosa
   validatedCode = code;
   validatedRole = role;
+
+  // Mostrar mensaje de bienvenida
+  const displayName = role === "judge" ? (judgeNames[code] || code) : "Público";
+  welcomeMsg.textContent = `✅ Bienvenido, ${displayName}. Puede emitir su voto.`;
+  welcomeMsg.style.color = "green";
+  welcomeMsg.style.display = "block";
+
+  // Mostrar el slider y desactivar carnet
   document.getElementById("scoreSection").style.display = "block";
   validateBtn.disabled = true;
   document.getElementById("code").disabled = true;
-  alert("✅ Carnet válido. Ahora elige la puntuación.");
 };
 
 // Paso 2: Enviar voto
