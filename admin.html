@@ -15,73 +15,63 @@
       margin: 0;
       padding: 20px;
     }
-
-    h1 {
-      color: #333;
+    h1 { color: #333; margin-bottom: 10px; }
+    .section {
+      background: white;
+      padding: 20px;
+      margin: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 320px;
     }
-
-    label {
-      font-size: 1.1rem;
-      margin-right: 8px;
-    }
-
     input {
       padding: 8px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      width: 250px;
+      width: 95%;
+      margin-bottom: 10px;
     }
-
     button {
       padding: 10px 16px;
-      margin-left: 10px;
       font-size: 1rem;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s;
+      width: 100%;
     }
-
     button:hover {
       background-color: #45a049;
     }
-
     #qrContainer, #resultsQR {
-      margin-top: 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-top: 20px;
       text-align: center;
-      width: fit-content;
-    }
-
-    a {
-      display: block;
-      margin-top: 8px;
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>Crear Encuesta</h1>
+  <h1>Panel de Administración</h1>
 
-  <div style="margin-bottom: 20px;">
-    <label for="title">Título de la Encuesta:</label>
-    <input id="title" placeholder="Ej: Señorita UMG 2025">
+  <!-- Sección 1: Crear Encuesta -->
+  <div class="section">
+    <h2>Crear Encuesta</h2>
+    <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
+    <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
     <button id="createPoll">Crear Encuesta</button>
+    <div id="qrContainer"></div>
+    <div id="resultsQR"></div>
   </div>
 
-  <div id="qrContainer"></div>
-  <div id="resultsQR"></div>
+  <!-- Sección 2: Registrar Jueces -->
+  <div class="section">
+    <h2>Registrar Juez</h2>
+    <input type="text" id="judgeCode" placeholder="Carnet (Ej: JUEZ1)">
+    <input type="text" id="judgeName" placeholder="Nombre del Juez">
+    <input type="text" id="judgePhoto" placeholder="URL de la Foto">
+    <button id="registerJudge">Registrar Juez</button>
+  </div>
 
   <script type="module" src="app.js"></script>
   <script type="module" src="admin.js"></script>
