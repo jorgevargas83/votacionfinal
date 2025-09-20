@@ -15,72 +15,82 @@
       margin: 0;
       padding: 20px;
     }
-    h1 { color: #333; margin-bottom: 10px; }
-    .section {
+
+    .card {
       background: white;
       padding: 20px;
-      margin: 10px;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      width: 340px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 400px;
     }
-    input[type="text"] {
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
       padding: 8px;
+      margin: 6px 0;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      width: 95%;
-      margin-bottom: 10px;
     }
+
     button {
-      padding: 10px 16px;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
       font-size: 1rem;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      width: 100%;
     }
+
     button:hover {
       background-color: #45a049;
     }
+
+    #judgesContainer {
+      margin-top: 10px;
+      background: #f8f8f8;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      display: none;
+    }
+
     .judge-item {
       display: flex;
       align-items: center;
-      margin: 6px 0;
-      font-size: 0.9rem;
       gap: 10px;
+      margin-bottom: 5px;
     }
+
     .judge-item img {
       width: 28px;
       height: 28px;
       border-radius: 50%;
       object-fit: cover;
     }
+
     #qrContainer, #resultsQR {
-      margin-top: 20px;
       text-align: center;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h1>Panel de Administración</h1>
 
-  <!-- Sección 1: Crear Encuesta -->
-  <div class="section">
-    <h2>Crear Encuesta</h2>
-    <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
-    <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
-    <h3>Selecciona Jueces:</h3>
-    <div id="judgesList">Cargando jueces...</div>
-    <button id="createPoll">Crear Encuesta</button>
-    <div id="qrContainer"></div>
-    <div id="resultsQR"></div>
-  </div>
-
-  <!-- Sección 2: Registrar Jueces -->
-  <div class="section">
+  <!-- Registrar juez -->
+  <div class="card">
     <h2>Registrar Juez</h2>
     <input type="text" id="judgeCode" placeholder="Carnet (Ej: JUEZ1)">
     <input type="text" id="judgeName" placeholder="Nombre del Juez">
@@ -88,31 +98,38 @@
     <button id="registerJudge">Registrar Juez</button>
   </div>
 
-  <script type="module" src="app.js"></script>
-  <script type="module" src="admin.js"></script>
-<div class="section">
-  <h2>Crear Encuesta</h2>
-  <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
-  <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
-  
-  <h3 style="cursor:pointer" onclick="toggleJudges()">👥 Seleccionar Jueces ▼</h3>
-  <div id="judgesContainer" style="display:none; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: #f8f8f8;">
-    <div id="judgesList">Cargando jueces...</div>
+  <!-- Crear encuesta -->
+  <div class="card">
+    <h2>Crear Encuesta</h2>
+    <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
+    <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
+
+    <h3 style="cursor:pointer" onclick="toggleJudges()">👥 Seleccionar Jueces ▼</h3>
+    <div id="judgesContainer">
+      <div style="margin-bottom: 8px;">
+        <button type="button" onclick="selectAllJudges(true)">✅ Seleccionar Todos</button>
+        <button type="button" onclick="selectAllJudges(false)">❌ Desmarcar Todos</button>
+      </div>
+      <div id="judgesList">Cargando jueces...</div>
+    </div>
+
+    <button id="createPoll">Crear Encuesta</button>
+    <div id="qrContainer"></div>
+    <div id="resultsQR"></div>
   </div>
 
-  <button id="createPoll">Crear Encuesta</button>
-  <div id="qrContainer"></div>
-  <div id="resultsQR"></div>
-</div>
+  <script type="module" src="app.js"></script>
+  <script type="module" src="admin.js"></script>
 
-<script>
-  function toggleJudges() {
-    const container = document.getElementById("judgesContainer");
-    container.style.display = container.style.display === "none" ? "block" : "none";
-  }
-</script>
+  <script>
+    function toggleJudges() {
+      const container = document.getElementById("judgesContainer");
+      container.style.display = container.style.display === "none" ? "block" : "none";
+    }
 
-
+    function selectAllJudges(check) {
+      document.querySelectorAll("#judgesList input[type=checkbox]").forEach(cb => cb.checked = check);
+    }
+  </script>
 </body>
 </html>
-
