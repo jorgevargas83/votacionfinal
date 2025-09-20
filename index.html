@@ -2,14 +2,72 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Inicio - Votación</title>
+  <title>Plataforma de Votación</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #007bff, #00c6ff);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 250px;
+    }
+
+    .btn-link {
+      background: white;
+      color: #007bff;
+      text-decoration: none;
+      padding: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-align: center;
+    }
+
+    .btn-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
-  <h1>Sistema de Votación</h1>
-  <p>Selecciona una opción:</p>
-  <a href="admin.html">Ir al Panel de Administración</a><br>
-  <a href="vote.html">Ir a Votación (usar enlace QR)</a><br>
-  <a href="results.html">Ver Resultados</a>
+  <div class="container">
+    <div class="logo">📊 Plataforma de Votación</div>
+
+    <div class="buttons">
+      <a href="admin.html" class="btn-link">Panel de Administración</a>
+      <a href="results.html" class="btn-link">Ver Resultados</a>
+      <a href="vote.html" class="btn-link">Ir a Votación</a>
+    </div>
+
+    <div class="footer">
+      &copy; 2025 Sistema de Votación | Desarrollado para tu proyecto 🎓
+    </div>
+  </div>
 </body>
 </html>
