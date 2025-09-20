@@ -1,22 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <title>Admin Votación</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
   <h1>Crear Encuesta</h1>
-  <input id="title" placeholder="Título de la encuesta">
-  <button id="createPoll">Crear</button>
-  <a id="resultsLink" style="display:none" target="_blank">Ver Resultados</a>
 
-  <div id="qrContainer" style="display:none">
-    <h3>Escanea para votar</h3>
-    <canvas id="qrCanvas"></canvas>
-  </div>
+  <label>Título de la Encuesta:</label>
+  <input id="title" placeholder="Ej: Señorita UMG 2025">
+  <button id="createPoll">Crear Encuesta</button>
 
+  <div id="qrContainer" style="margin-top:20px; text-align:center;"></div>
+  <div id="resultsQR" style="margin-top:20px; text-align:center;"></div>
+
+  <script type="module" src="app.js"></script>
   <script type="module" src="admin.js"></script>
 </body>
 </html>
+
