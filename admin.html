@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Votación</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+  <h1>Crear Encuesta</h1>
+  <input id="title" placeholder="Título de la encuesta">
+  <button id="createPoll">Crear</button>
+  <a id="resultsLink" style="display:none" target="_blank">Ver Resultados</a>
+
+  <div id="qrContainer" style="display:none">
+    <h3>Escanea para votar</h3>
+    <canvas id="qrCanvas"></canvas>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
