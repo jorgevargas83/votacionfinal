@@ -18,17 +18,18 @@ const closePollBtn = document.getElementById("closePollBtn");
 const judgesInfo = {
   JUEZ1: {
     name: "Ing. Chinchilla",
-    photo: "https://drive.google.com/uc?id=1_ct5WtotaYDi3lxgri1aNgf5sojC8ojC"
+    photo: "https://drive.google.com/uc?export=view&id=1_ct5WtotaYDi3lxgri1aNgf5sojC8ojC"
   },
   JUEZ2: {
     name: "Ing. Villatoro",
-    photo: "https://drive.google.com/uc?id=1lAqor5HSJi-SH731ifu5bR3uVLepvgx1"
+    photo: "https://drive.google.com/uc?export=view&id=1lAqor5HSJi-SH731ifu5bR3uVLepvgx1"
   },
   JUEZ3: {
     name: "Ing. Guzmán",
-    photo: "https://drive.google.com/uc?id=1pcIwoTWJMpnx0AZ8ngYS0Hm1xYM-r2E1"
+    photo: "https://drive.google.com/uc?export=view&id=1pcIwoTWJMpnx0AZ8ngYS0Hm1xYM-r2E1"
   }
 };
+
 
 if (closePollBtn) {
   closePollBtn.onclick = async () => {
@@ -90,3 +91,4 @@ function listenVotes(judges, publics) {
     resultsDiv.innerHTML = html;
   });
 }
+
