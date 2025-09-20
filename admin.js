@@ -17,7 +17,7 @@ document.getElementById("createPoll").onclick = async function () {
 
     const pollId = pollRef.id;
 
-    // 2️⃣ Crear jueces con nombre y foto automáticamente
+    // 2️⃣ Crear jueces automáticamente
     const judges = [
       {
         code: "JUEZ1",
@@ -45,13 +45,42 @@ document.getElementById("createPoll").onclick = async function () {
       });
     }
 
-    // 3️⃣ Crear códigos de público automáticamente
+    // 3️⃣ Crear público automáticamente
     const publicCodes = ["PUBLICO1", "PUBLICO2", "PUBLICO3"];
     for (const p of publicCodes) {
       await addDoc(collection(db, "public"), { pollId, code: p });
     }
 
     alert("✅ Encuesta creada con jueces y público incluidos.");
+
+    // 4️⃣ Generar enlace y QR de votación
+    const voteLink = `${window.location.origin}/vote.html?poll=${pollId}`;
+    const qrContainer = document.getElementById("qrContainer");
+    qrContainer.innerHTML = "<h3>Votar</h3>";
+
+    QRCode.toCanvas(voteLink, { width: 200 }, function (err, canvas) {
+      if (err) console.error(err);
+      qrContainer.appendChild(canvas);
+    });
+
+    const linkElement = document.createElement("p");
+    linkElement.innerHTML = `<a href="${voteLink}" target="_blank">${voteLink}</a>`;
+    qrContainer.appendChild(linkElement);
+
+    // 5️⃣ Generar QR de Resultados
+    const resultsLink = `${window.location.origin}/results.html?poll=${pollId}`;
+    const resultsQR = document.getElementById("resultsQR");
+    resultsQR.innerHTML = "<h3>Resultados en Vivo</h3>";
+
+    QRCode.toCanvas(resultsLink, { width: 200 }, function (err, canvas) {
+      if (err) console.error(err);
+      resultsQR.appendChild(canvas);
+    });
+
+    const resultsElement = document.createElement("p");
+    resultsElement.innerHTML = `<a href="${resultsLink}" target="_blank">${resultsLink}</a>`;
+    resultsQR.appendChild(resultsElement);
+
   } catch (error) {
     console.error("❌ Error creando la encuesta:", error);
     alert("Ocurrió un error al crear la encuesta. Revisa la consola.");
