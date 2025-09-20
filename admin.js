@@ -9,7 +9,7 @@ import {
 
 const judgesList = document.getElementById("judgesList");
 
-// 🔄 Función para cargar lista de jueces
+// 🔄 Cargar lista de jueces
 async function loadJudges() {
   judgesList.innerHTML = "Cargando jueces...";
   try {
@@ -20,7 +20,7 @@ async function loadJudges() {
       return;
     }
 
-    // Usar Map para evitar duplicados
+    // Evitar duplicados
     const uniqueJudges = new Map();
 
     snapshot.forEach(docSnap => {
@@ -50,7 +50,6 @@ async function loadJudges() {
   }
 }
 
-// Ejecutar al cargar la página
 await loadJudges();
 
 // CREAR ENCUESTA
@@ -61,7 +60,6 @@ document.getElementById("createPoll").onclick = async function () {
   if (!title) return alert("⚠️ El nombre es obligatorio");
 
   try {
-    // Crear encuesta en Firestore
     const pollRef = await addDoc(collection(db, "polls"), {
       title,
       photo: photoURL,
@@ -69,7 +67,6 @@ document.getElementById("createPoll").onclick = async function () {
     });
     const pollId = pollRef.id;
 
-    // Obtener jueces seleccionados
     const selected = document.querySelectorAll("#judgesList input:checked");
     let totalJueces = 0;
 
@@ -113,12 +110,10 @@ document.getElementById("createPoll").onclick = async function () {
     });
     resultsQR.innerHTML += `<p><a href="${resultsLink}" target="_blank">${resultsLink}</a></p>`;
 
-    // Limpiar campos de encuesta
+    // Limpiar campos y desmarcar
     document.getElementById("title").value = "";
     document.getElementById("photoURL").value = "";
-
-    // Desmarcar jueces seleccionados
-    document.querySelectorAll("#judgesList input:checked").forEach(cb => (cb.checked = false));
+    document.querySelectorAll("#judgesList input:checked").forEach(cb => cb.checked = false);
 
   } catch (error) {
     console.error("Error creando encuesta:", error);
@@ -141,12 +136,11 @@ document.getElementById("registerJudge").onclick = async function () {
 
     alert(`✅ Juez ${name} registrado correctamente`);
 
-    // Limpiar campos
+    // Limpiar campos y recargar lista
     document.getElementById("judgeCode").value = "";
     document.getElementById("judgeName").value = "";
     document.getElementById("judgePhoto").value = "";
 
-    // Refrescar lista de jueces
     await loadJudges();
   } catch (error) {
     console.error("Error registrando juez:", error);
