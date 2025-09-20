@@ -13,26 +13,27 @@ const params = new URLSearchParams(location.search);
 const pollId = params.get("poll");
 const scoreInput = document.getElementById("score");
 const scoreValue = document.getElementById("scoreValue");
+const validateBtn = document.getElementById("validateCode");
+
+let validatedCode = null;
+let validatedRole = null;
 
 scoreInput.addEventListener("input", () => {
   scoreValue.textContent = scoreInput.value;
 });
 
-document.getElementById("voteBtn").onclick = async () => {
-  // ✅ Verificar si encuesta está abierta
+// Paso 1: Validar carnet
+validateBtn.onclick = async () => {
+  const code = document.getElementById("code").value.trim().toUpperCase();
+  if (!code) return alert("⚠️ Escribe tu carnet");
+
+  // Verificar si encuesta existe y está abierta
   const pollRef = doc(db, "polls", pollId);
   const pollSnap = await getDoc(pollRef);
-
   if (!pollSnap.exists()) return alert("❌ Encuesta no encontrada.");
-  if (pollSnap.data().is_open === false) {
-    alert("🚫 Esta encuesta ya fue cerrada.");
-    return;
-  }
+  if (pollSnap.data().is_open === false) return alert("🚫 Encuesta cerrada.");
 
-  const code = document.getElementById("code").value.trim().toUpperCase();
-  const score = parseFloat(scoreInput.value);
-  if (!code) return alert("Escribe tu carnet");
-
+  // Buscar si el carnet pertenece a jueces o público
   const judgesSnap = await getDocs(
     query(collection(db, "judges"), where("pollId", "==", pollId), where("code", "==", code))
   );
@@ -41,18 +42,29 @@ document.getElementById("voteBtn").onclick = async () => {
   );
 
   let role = judgesSnap.empty ? (publicSnap.empty ? null : "public") : "judge";
-  if (!role) return alert("Código inválido");
+  if (!role) return alert("❌ Código inválido");
 
-  // ✅ Validación de voto único
+  // Verificar si ya votó
   const existingSnap = await getDocs(
     query(collection(db, "votes"), where("pollId", "==", pollId), where("code", "==", code))
   );
-  if (!existingSnap.empty) {
-    alert("⚠️ Este carnet ya votó en esta encuesta.");
-    return;
-  }
+  if (!existingSnap.empty) return alert("⚠️ Este carnet ya votó.");
 
-  await addDoc(collection(db, "votes"), { pollId, code, role, score });
-  alert("✅ Voto registrado");
+  // ✅ Validación exitosa → habilitar la sección de votación
+  validatedCode = code;
+  validatedRole = role;
+  document.getElementById("scoreSection").style.display = "block";
+  validateBtn.disabled = true;
+  document.getElementById("code").disabled = true;
+  alert("✅ Carnet válido. Ahora elige la puntuación.");
+};
+
+// Paso 2: Enviar voto
+document.getElementById("voteBtn").onclick = async () => {
+  if (!validatedCode) return alert("⚠️ Primero valida tu carnet.");
+  const score = parseFloat(scoreInput.value);
+
+  await addDoc(collection(db, "votes"), { pollId, code: validatedCode, role: validatedRole, score });
+  alert("✅ Voto registrado correctamente");
   document.getElementById("voteForm").style.display = "none";
 };
