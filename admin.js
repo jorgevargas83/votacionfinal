@@ -1,8 +1,41 @@
 import { db } from "./app.js";
 import {
   collection,
-  addDoc
+  addDoc,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+// 🔄 Cargar lista de jueces al cargar la página
+async function loadJudges() {
+  const listContainer = document.getElementById("judgesList");
+  listContainer.innerHTML = "Cargando jueces...";
+
+  try {
+    const snapshot = await getDocs(collection(db, "judges"));
+    if (snapshot.empty) {
+      listContainer.innerHTML = "<p>No hay jueces registrados aún.</p>";
+      return;
+    }
+
+    listContainer.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const div = document.createElement("div");
+      div.classList.add("judge-item");
+      div.innerHTML = `
+        <input type="checkbox" value="${doc.id}">
+        <img src="${data.photo}" alt="${data.name}">
+        <span>${data.name} (${data.code})</span>
+      `;
+      listContainer.appendChild(div);
+    });
+  } catch (error) {
+    console.error("Error cargando jueces:", error);
+    listContainer.innerHTML = "❌ Error al cargar jueces.";
+  }
+}
+
+await loadJudges();
 
 // CREAR ENCUESTA
 document.getElementById("createPoll").onclick = async function () {
@@ -11,63 +44,42 @@ document.getElementById("createPoll").onclick = async function () {
   if (!title) return alert("⚠️ El nombre es obligatorio");
 
   try {
+    // 1️⃣ Crear la encuesta
     const pollRef = await addDoc(collection(db, "polls"), {
       title,
       photo: photoURL,
       is_open: true
     });
-
     const pollId = pollRef.id;
 
-    alert("✅ Encuesta creada con éxito");
+    // 2️⃣ Obtener jueces seleccionados
+    const selected = document.querySelectorAll("#judgesList input:checked");
+    let totalJueces = 0;
 
+    for (const checkbox of selected) {
+      const judgeDoc = await getDocs(collection(db, "judges"));
+      const judgeData = judgeDoc.docs.find(d => d.id === checkbox.value)?.data();
+      if (judgeData) {
+        await addDoc(collection(db, "judges"), {
+          pollId,
+          code: judgeData.code,
+          name: judgeData.name,
+          photo: judgeData.photo
+        });
+        totalJueces++;
+      }
+    }
+
+    // 3️⃣ Público por defecto
+    const publicCodes = ["PUBLICO1", "PUBLICO2", "PUBLICO3"];
+    for (const p of publicCodes) {
+      await addDoc(collection(db, "public"), { pollId, code: p });
+    }
+
+    alert(`✅ Encuesta creada con ${totalJueces} jueces seleccionados.`);
+
+    // 4️⃣ Mostrar QR
     const voteLink = `${window.location.origin}/vote.html?poll=${pollId}`;
     const resultsLink = `${window.location.origin}/results.html?poll=${pollId}`;
 
-    // QR de Votación
-    const qrContainer = document.getElementById("qrContainer");
-    qrContainer.innerHTML = "<h3>Votar</h3>";
-    QRCode.toCanvas(voteLink, { width: 200 }, (err, canvas) => {
-      if (!err) qrContainer.appendChild(canvas);
-    });
-    qrContainer.innerHTML += `<p><a href="${voteLink}" target="_blank">${voteLink}</a></p>`;
-
-    // QR de Resultados
-    const resultsQR = document.getElementById("resultsQR");
-    resultsQR.innerHTML = "<h3>Resultados en Vivo</h3>";
-    QRCode.toCanvas(resultsLink, { width: 200 }, (err, canvas) => {
-      if (!err) resultsQR.appendChild(canvas);
-    });
-    resultsQR.innerHTML += `<p><a href="${resultsLink}" target="_blank">${resultsLink}</a></p>`;
-  } catch (error) {
-    console.error("Error creando encuesta:", error);
-    alert("Ocurrió un error al crear la encuesta.");
-  }
-};
-
-// REGISTRAR JUEZ
-document.getElementById("registerJudge").onclick = async function () {
-  const code = (document.getElementById("judgeCode").value || "").trim();
-  const name = (document.getElementById("judgeName").value || "").trim();
-  const photo = (document.getElementById("judgePhoto").value || "").trim();
-
-  if (!code || !name || !photo) {
-    return alert("⚠️ Completa todos los campos antes de registrar.");
-  }
-
-  try {
-    await addDoc(collection(db, "judges"), {
-      code,
-      name,
-      photo
-    });
-
-    alert(`✅ Juez ${name} registrado correctamente`);
-    document.getElementById("judgeCode").value = "";
-    document.getElementById("judgeName").value = "";
-    document.getElementById("judgePhoto").value = "";
-  } catch (error) {
-    console.error("Error registrando juez:", error);
-    alert("❌ Hubo un error registrando el juez.");
-  }
-};
+    const qr
