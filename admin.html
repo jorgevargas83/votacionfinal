@@ -57,32 +57,31 @@
       background-color: #45a049;
     }
 
-    #judgesContainer {
-      margin-top: 10px;
-      background: #f8f8f8;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      display: none;
-    }
-
-    .judge-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 5px;
-    }
-
-    .judge-item img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
     #qrContainer, #resultsQR {
       text-align: center;
       margin-top: 20px;
+    }
+
+    canvas {
+      display: block;
+      margin: 10px auto;
+    }
+
+    .qr-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .qr-buttons button {
+      width: auto;
+      display: inline-block;
+      background-color: #007bff;
+      margin: 5px;
+    }
+
+    .qr-buttons button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
@@ -103,9 +102,8 @@
     <h2>Crear Encuesta</h2>
     <input type="text" id="title" placeholder="Nombre del Proyecto a Votar">
     <input type="text" id="photoURL" placeholder="URL de Foto del Encuestado">
-
     <h3 style="cursor:pointer" onclick="toggleJudges()">👥 Seleccionar Jueces ▼</h3>
-    <div id="judgesContainer">
+    <div id="judgesContainer" style="display:none;">
       <div style="margin-bottom: 8px;">
         <button type="button" onclick="selectAllJudges(true)">✅ Seleccionar Todos</button>
         <button type="button" onclick="selectAllJudges(false)">❌ Desmarcar Todos</button>
