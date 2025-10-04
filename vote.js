@@ -13,120 +13,83 @@ const params = new URLSearchParams(location.search);
 const pollId = params.get("poll");
 const scoreInput = document.getElementById("score");
 const scoreValue = document.getElementById("scoreValue");
-const validateBtn = document.getElementById("validateCode");
 const welcomeMsg = document.getElementById("welcomeMsg");
 const judgePhoto = document.getElementById("judgePhoto");
 
 let validatedCode = null;
-let validatedRole = null;
 
-// 🔹 Actualiza el valor del slider
+// Cambiar entre modos
+document.getElementById("publicMode").onclick = () => {
+  document.getElementById("roleSelect").style.display = "none";
+  document.getElementById("publicSection").style.display = "block";
+};
+
+document.getElementById("judgeMode").onclick = () => {
+  document.getElementById("roleSelect").style.display = "none";
+  document.getElementById("judgeForm").style.display = "block";
+};
+
+// Actualizar slider
 scoreInput.addEventListener("input", () => {
   scoreValue.textContent = scoreInput.value;
 });
 
-// 🔹 Información de jueces predefinidos
-const judgesInfo = {
-  JUEZ1: {
-    name: "Ing. Chinchilla",
-    photo: "https://drive.google.com/uc?export=view&id=1_ct5WtotaYDi3lxgri1aNgf5sojC8ojC",
-  },
-  JUEZ2: {
-    name: "Ing. Villatoro",
-    photo: "https://drive.google.com/uc?export=view&id=1lAqor5HSJi-SH731ifu5bR3uVLepvgx1",
-  },
-  JUEZ3: {
-    name: "Ing. Guzmán",
-    photo: "https://drive.google.com/uc?export=view&id=1pcIwoTWJMpnx0AZ8ngYS0Hm1xYM-r2E1",
-  },
-};
-
-// 🧩 Paso 1: Validar Carnet
-validateBtn.onclick = async () => {
+// Validar juez
+document.getElementById("validateCode").onclick = async () => {
   const code = document.getElementById("code").value.trim().toUpperCase();
-  if (!code) return alert("⚠️ Escribe tu carnet");
+  if (!code) return alert("⚠️ Escribe tu carnet de juez");
 
-  // Verificar si la encuesta existe y está abierta
   const pollRef = doc(db, "polls", pollId);
   const pollSnap = await getDoc(pollRef);
   if (!pollSnap.exists()) return alert("❌ Encuesta no encontrada.");
   if (pollSnap.data().is_open === false) return alert("🚫 Encuesta cerrada.");
 
-  // Buscar si el carnet pertenece a jueces o público
+  // Buscar juez
   const judgesSnap = await getDocs(
     query(collection(db, "judges"), where("pollId", "==", pollId), where("code", "==", code))
   );
-  const publicSnap = await getDocs(
-    query(collection(db, "public"), where("pollId", "==", pollId), where("code", "==", code))
-  );
-
-  let role = judgesSnap.empty ? (publicSnap.empty ? null : "public") : "judge";
-  if (!role) return alert("❌ Código inválido");
+  if (judgesSnap.empty) return alert("❌ Código de juez no válido.");
 
   // Verificar si ya votó
   const existingSnap = await getDocs(
     query(collection(db, "votes"), where("pollId", "==", pollId), where("code", "==", code))
   );
-  if (!existingSnap.empty) return alert("⚠️ Este carnet ya votó.");
+  if (!existingSnap.empty) return alert("⚠️ Este juez ya votó.");
 
-  // ✅ Validación exitosa
   validatedCode = code;
-  validatedRole = role;
 
-  // Mostrar mensaje y foto según rol
-  if (role === "judge") {
-    const info = judgesInfo[code] || { name: code, photo: "" };
-    welcomeMsg.textContent = `✅ Bienvenido, ${info.name}. Puede emitir su voto.`;
-    welcomeMsg.style.color = "green";
-    welcomeMsg.style.display = "block";
-
-    if (info.photo) {
-      judgePhoto.src = info.photo;
-      judgePhoto.style.display = "block";
-    }
-
-    document.getElementById("scoreSection").style.display = "block";
-    document.getElementById("publicSection").style.display = "none";
-  } else {
-    welcomeMsg.textContent = "✅ Bienvenido, Público. Puede emitir su voto.";
-    welcomeMsg.style.color = "green";
-    welcomeMsg.style.display = "block";
-    judgePhoto.style.display = "none";
-    document.getElementById("publicSection").style.display = "block";
-    document.getElementById("scoreSection").style.display = "none";
-  }
-
-  validateBtn.disabled = true;
+  welcomeMsg.textContent = "✅ Juez validado, puede emitir su voto.";
+  welcomeMsg.style.display = "block";
+  document.getElementById("scoreSection").style.display = "block";
+  document.getElementById("validateCode").disabled = true;
   document.getElementById("code").disabled = true;
 };
 
-// 🧩 Paso 2: Enviar voto de juez
+// Enviar voto de juez
 document.getElementById("voteBtn").onclick = async () => {
-  if (!validatedCode) return alert("⚠️ Primero valida tu carnet.");
+  if (!validatedCode) return alert("⚠️ Primero valida tu carnet de juez.");
   const score = parseFloat(scoreInput.value);
 
   await addDoc(collection(db, "votes"), {
     pollId,
     code: validatedCode,
-    role: validatedRole,
+    role: "judge",
     score,
   });
 
   alert("✅ Voto del juez registrado correctamente");
-  document.getElementById("voteForm").style.display = "none";
+  document.getElementById("judgeForm").style.display = "none";
 };
 
-// 🧩 Paso 3: Enviar voto del público
+// Enviar voto público
 document.getElementById("publicVoteBtn").onclick = async () => {
-  if (!validatedCode) return alert("⚠️ Primero valida tu carnet.");
-
   await addDoc(collection(db, "votes"), {
     pollId,
-    code: validatedCode,
     role: "public",
-    score: 10, // valor fijo para el público
+    code: "PUBLICO",
+    score: 10,
   });
 
-  alert("✅ Voto del público registrado correctamente");
-  document.getElementById("voteForm").style.display = "none";
+  alert("✅ Gracias por tu voto público");
+  document.getElementById("publicSection").innerHTML = "<h3>🎉 ¡Tu voto fue registrado!</h3>";
 };
